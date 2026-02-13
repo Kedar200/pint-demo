@@ -113,7 +113,6 @@ function App() {
 
   return (
     <div className="app">
-      <CodeBlock title="Custom Height Logic" code={customExampleCode} />
         <div className="header">
             <div className="header-title">Pint<span className="highlight">Demo</span></div>
             <div className="header-links">
@@ -142,6 +141,7 @@ function App() {
                 </>
               ) : (
                 <>
+                  <CodeBlock title="Custom Height Logic" code={customExampleCode} />
                   <CustomHeightMasonry pins={pins} />
                 </>
               )}
