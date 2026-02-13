@@ -1,0 +1,297 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background: #f0f2f5;
+  /* Light gray background for contrast */
+  min-height: 100vh;
+  color: #111;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+  padding: 16px 32px;
+  align-items: center;
+  height: 80px;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e60023;
+  /* Pinterest Red-ish */
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-title .highlight {
+  color: #111;
+}
+
+.header-links {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.header-btn {
+  padding: 10px 16px;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  color: #111;
+  background: transparent;
+}
+
+.header-btn:hover,
+.header-btn.active {
+  background: #e9e9e9;
+}
+
+.user-profile-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e9e9e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.user-profile-icon:hover {
+  background: #d0d0d0;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 24px 40px;
+  max-width: 1800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Masonry Card */
+.masonry-card {
+  break-inside: avoid;
+  margin-bottom: 0;
+  /* Library handles gap */
+  cursor: zoom-in;
+  position: relative;
+  border-radius: 16px;
+  background: transparent;
+  /* Card itself doesn't need bg if only image wrapper has it or handled by children */
+}
+
+/* Image Wrapper & Overlay */
+.card-image-wrapper {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f0f0f0;
+  /* Placeholder color */
+}
+
+.card-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 12px;
+  pointer-events: none;
+  /* Let clicks pass through if needed, but button needs pointer-events: auto */
+}
+
+.masonry-card:hover .card-overlay {
+  opacity: 1;
+}
+
+.save-btn {
+  background: #e60023;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.save-btn:hover {
+  background: #ad081b;
+  transform: scale(1.05);
+}
+
+/* Card Content */
+.card-content {
+  padding: 8px 10px;
+  height: 40px;
+  /* Matched to JS getCustomItemSize footerHeight */
+  display: flex;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 0.8rem;
+  color: #5f5f5f;
+  font-weight: 400;
+}
+
+.card-likes {
+  font-size: 0.75rem;
+  color: #767676;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 16px;
+    height: auto;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .header-links {
+    display: none;
+    /* Hide for simple demo on mobile */
+  }
+
+  .main-content {
+    padding: 16px;
+  }
+}
+
+/* Code Block Styles */
+.example-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.code-block-container {
+  background: #1e1e1e;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  margin-top: 20px;
+  border: 1px solid #333;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #252526;
+  border-bottom: 1px solid #333;
+}
+
+.code-title {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.copy-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.code-pre {
+  padding: 20px;
+  overflow-x: auto;
+  margin: 0;
+}
+
+.code-pre code {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9rem;
+  color: #d4d4d4;
+  line-height: 1.5;
+}
