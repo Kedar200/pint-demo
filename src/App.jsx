@@ -1,9 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { MasonryGrid, getImageSize } from 'react-masonry-virtualized';
 import CodeBlock from './components/CodeBlock';
 import { simpleExampleCode, customExampleCode } from './exampleCode';
 import { pinterestImages } from './demoData';
 import './index.css';
+
+const PAGE_SIZE = 20;
 
 // Helper to generate consistent mock data
 const generateMockData = (images) => {
@@ -32,7 +34,7 @@ const generateMockData = (images) => {
 };
 
 // 1. Simple Example Component
-const SimpleMasonry = ({ pins }) => {
+const SimpleMasonry = ({ pins, onEndReached }) => {
   const renderItem = (pin) => (
     <div className="masonry-card simple-card">
        <div className="card-image-wrapper">
@@ -43,7 +45,6 @@ const SimpleMasonry = ({ pins }) => {
             className="card-image"
           />
        </div>
-       {/* No text content, just image */}
     </div>
   );
 
@@ -51,16 +52,17 @@ const SimpleMasonry = ({ pins }) => {
     <MasonryGrid
       items={pins}
       renderItem={renderItem}
-      // Standard usage: just pass the image URL for size calculation
       getItemSize={(pin) => getImageSize(pin.image)} 
       gap={20}
       minWidth={236}
+      onEndReached={onEndReached}
+      onEndReachedThreshold={500}
     />
   );
 };
 
 // 2. Custom Height Example Component
-const CustomHeightMasonry = ({ pins }) => {
+const CustomHeightMasonry = ({ pins, onEndReached }) => {
   const renderItem = (pin) => (
     <div className="masonry-card custom-card">
        <div className="card-image-wrapper">
@@ -76,20 +78,13 @@ const CustomHeightMasonry = ({ pins }) => {
        </div>
        <div className="card-content">
           <h3 className="card-title">{pin.title}</h3>
-          {/* We can add more text here, space is reserved */}
        </div>
     </div>
   );
 
-  // Custom size calculator that adds fixed height for text
   const getCustomItemSize = async (pin) => {
     const dimensions = await getImageSize(pin.image);
-    const footerHeight = 40; // Approx height for text area
-    
-    // We add the footer height relative to the aspect ratio
-    // The library uses aspect ratio to layout. If we add height, we effectively change the aspect ratio.
-    // The internal calculation for column height will then account for this extra vertical space.
-    // Note: 236 is a standard Pinterest column width used for normalization here.
+    const footerHeight = 40;
     return {
       width: dimensions.width,
       height: dimensions.height + (footerHeight * (dimensions.width / 236)) 
@@ -103,13 +98,30 @@ const CustomHeightMasonry = ({ pins }) => {
       getItemSize={getCustomItemSize} 
       gap={20}
       minWidth={236}
+      onEndReached={onEndReached}
+      onEndReachedThreshold={500}
     />
   );
 };
 
 function App() {
-  const pins = useMemo(() => generateMockData(pinterestImages), []);
-  const [mode, setMode] = useState('simple'); // 'simple' or 'custom'
+  const allPins = useMemo(() => generateMockData(pinterestImages), []);
+  const [mode, setMode] = useState('simple');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  // Load next batch when scrolled near the end
+  const loadMore = useCallback(() => {
+    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, allPins.length));
+  }, [allPins.length]);
+
+  // Slice the pins to only show the current page
+  const visiblePins = useMemo(() => allPins.slice(0, visibleCount), [allPins, visibleCount]);
+
+  // Reset visible count when switching modes
+  const handleModeChange = useCallback((newMode) => {
+    setMode(newMode);
+    setVisibleCount(PAGE_SIZE);
+  }, []);
 
   return (
     <div className="app">
@@ -118,13 +130,13 @@ function App() {
             <div className="header-links">
                 <button 
                   className={`header-btn ${mode === 'simple' ? 'active' : ''}`} 
-                  onClick={() => setMode('simple')}
+                  onClick={() => handleModeChange('simple')}
                 >
                   Simple Example
                 </button>
                 <button 
                   className={`header-btn ${mode === 'custom' ? 'active' : ''}`} 
-                  onClick={() => setMode('custom')}
+                  onClick={() => handleModeChange('custom')}
                 >
                   Custom Height Example
                 </button>
@@ -133,17 +145,21 @@ function App() {
         </div>
         <div className="main-content">
             <div className="example-wrapper">
-              
               {mode === 'simple' ? (
                 <>
                   <CodeBlock title="Simple Usage" code={simpleExampleCode} />
-                  <SimpleMasonry pins={pins} />
+                  <SimpleMasonry pins={visiblePins} onEndReached={loadMore} />
                 </>
               ) : (
                 <>
                   <CodeBlock title="Custom Height Logic" code={customExampleCode} />
-                  <CustomHeightMasonry pins={pins} />
+                  <CustomHeightMasonry pins={visiblePins} onEndReached={loadMore} />
                 </>
+              )}
+              {visibleCount < allPins.length && (
+                <p style={{ textAlign: 'center', color: '#767676', padding: '20px' }}>
+                  Showing {visibleCount} of {allPins.length} items — scroll to load more
+                </p>
               )}
             </div>
         </div>
