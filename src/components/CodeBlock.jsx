@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-const CodeBlock = ({ code, title }) => {
+export default function CodeBlock({ code, title }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -13,8 +13,8 @@ const CodeBlock = ({ code, title }) => {
     <div className="code-block-container">
       <div className="code-header">
         <span className="code-title">{title}</span>
-        <button className="copy-btn" onClick={handleCopy}>
-          {copied ? 'Copied!' : 'Copy Code'}
+        <button className={`copy-btn${copied ? ' copied' : ''}`} onClick={handleCopy}>
+          {copied ? '✓ Copied' : 'Copy'}
         </button>
       </div>
       <pre className="code-pre">
@@ -22,6 +22,4 @@ const CodeBlock = ({ code, title }) => {
       </pre>
     </div>
   );
-};
-
-export default CodeBlock;
+}

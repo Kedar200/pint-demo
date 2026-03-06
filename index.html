@@ -3,21 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>React Masonry Virtualized Demo — Pinterest-style Grids with Virtualization</title>
-  <meta name="description" content="Live interactive demo for react-masonry-virtualized v2.0.3 — Pinterest-style masonry grids with virtualization, infinite scroll, and skeleton loading for React.">
+  <title>React Masonry Virtualized — Pinterest-style Grids with Virtualization, Infinite Scroll & SEO</title>
+  <meta name="description" content="Live interactive demo for react-masonry-virtualized v2.0.3 — Build Pinterest-style masonry grids with virtualization, infinite scroll, skeleton loading, custom actions, SEO optimization, and geo-responsive content for React.">
   <link rel="canonical" href="https://pint-demo.netlify.app/">
+
+  <!-- Geo Meta Tags -->
+  <meta name="geo.region" content="US">
+  <meta name="geo.placename" content="Global">
+  <meta name="ICBM" content="37.7749, -122.4194">
+
+  <!-- Hreflang for Geo Targeting -->
+  <link rel="alternate" hreflang="en" href="https://pint-demo.netlify.app/">
+  <link rel="alternate" hreflang="x-default" href="https://pint-demo.netlify.app/">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="React Masonry Virtualized Demo">
-  <meta property="og:description" content="Interactive demo showcasing Pinterest-style masonry grids with virtualization, infinite scroll, and skeleton loading.">
+  <meta property="og:title" content="React Masonry Virtualized — Pinterest-style Grids for React">
+  <meta property="og:description" content="Interactive demo showcasing Pinterest-style masonry grids with virtualization, infinite scroll, skeleton loading, custom actions, and SEO optimization.">
   <meta property="og:url" content="https://pint-demo.netlify.app/">
   <meta property="og:site_name" content="PintDemo">
+  <meta property="og:locale" content="en_US">
 
   <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="React Masonry Virtualized Demo">
-  <meta name="twitter:description" content="Interactive demo showcasing Pinterest-style masonry grids with virtualization, infinite scroll, and skeleton loading.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="React Masonry Virtualized — Pinterest-style Grids for React">
+  <meta name="twitter:description" content="Build Pinterest-style masonry grids with virtualization, infinite scroll, skeleton loading, and custom actions. Open-source React component.">
+
+  <!-- Additional SEO -->
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="keywords" content="react masonry grid, pinterest grid, virtualized grid, infinite scroll, skeleton loading, react component, masonry layout, image gallery, portfolio grid, SEO masonry, geo-responsive grid">
+  <meta name="author" content="react-masonry-virtualized">
+  <meta name="theme-color" content="#faf8f5">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -25,31 +41,45 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- JSON-LD Structured Data -->
+  <!-- JSON-LD: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "react-masonry-virtualized",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "softwareVersion": "2.0.3",
+    "description": "A React component for building Pinterest-style masonry grids with built-in virtualization, infinite scroll, skeleton loading, custom actions, SEO optimization, and geo-responsive content support.",
+    "url": "https://pint-demo.netlify.app/",
+    "downloadUrl": "https://www.npmjs.com/package/react-masonry-virtualized",
+    "codeRepository": "https://github.com/kedar200/react-masonry-virtualized",
+    "programmingLanguage": "JavaScript",
+    "runtimePlatform": "React",
+    "license": "https://opensource.org/licenses/MIT",
+    "keywords": ["react", "masonry", "virtualized", "infinite-scroll", "pinterest-grid", "skeleton-loading", "seo", "geo-responsive"]
+  }
+  </script>
+
+  <!-- JSON-LD: WebPage -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "React Masonry Virtualized Demo",
     "url": "https://pint-demo.netlify.app/",
-    "description": "Live interactive demo showcasing react-masonry-virtualized v2.0.3 — a React component for Pinterest-style masonry grids with virtualization, infinite scroll, and skeleton loading.",
+    "description": "Live interactive demo for react-masonry-virtualized — Pinterest-style grids with virtualization, infinite scroll, and skeleton loading.",
     "isPartOf": {
       "@type": "WebSite",
       "name": "PintDemo",
       "url": "https://pint-demo.netlify.app/"
-    },
-    "about": {
-      "@type": "SoftwareSourceCode",
-      "name": "react-masonry-virtualized",
-      "version": "2.0.3",
-      "programmingLanguage": "JavaScript",
-      "runtimePlatform": "React",
-      "codeRepository": "https://www.npmjs.com/package/react-masonry-virtualized",
-      "description": "A React component for building Pinterest-style masonry grids with built-in virtualization, infinite scroll, and skeleton loading support.",
-      "license": "https://opensource.org/licenses/MIT",
-      "keywords": ["react", "masonry", "virtualized", "infinite-scroll", "pinterest-grid", "skeleton-loading"]
     },
     "breadcrumb": {
       "@type": "BreadcrumbList",
@@ -62,6 +92,83 @@
         }
       ]
     }
+  }
+  </script>
+
+  <!-- JSON-LD: FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is react-masonry-virtualized?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "react-masonry-virtualized is an open-source React component for building Pinterest-style masonry grids with built-in virtualization, infinite scroll, and skeleton loading support."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I install react-masonry-virtualized?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Install via npm: npm install react-masonry-virtualized. Then import MasonryGrid and getImageSize from the package."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does react-masonry-virtualized support SEO?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. It renders semantic HTML with proper img alt tags, lazy loading, and supports structured data (schema.org) for search engine discoverability."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I add custom actions like Like and Save buttons?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The renderItem prop gives you full control over each card's markup, allowing custom overlay actions like Like, Save, Share, and any other interactive element."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- JSON-LD: HowTo -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Build a Pinterest-style Grid with React",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Install the package",
+        "text": "Run npm install react-masonry-virtualized in your React project."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Import the component",
+        "text": "Import MasonryGrid and getImageSize from react-masonry-virtualized."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Pass items and render function",
+        "text": "Provide items array, renderItem function, getItemSize callback, and configure gap and minWidth props."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Add infinite scroll (optional)",
+        "text": "Use onEndReached callback with loadingPlaceholder and skeletonCount for infinite loading."
+      }
+    ]
   }
   </script>
 </head>

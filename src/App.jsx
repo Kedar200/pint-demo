@@ -1,15 +1,28 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { MasonryGrid } from "react-masonry-virtualized";
+import Sidebar from "./components/Sidebar";
+import CodeBlock from "./components/CodeBlock";
+import FeatureCard from "./components/FeatureCard";
+import {
+  simpleExample,
+  overlayExample,
+  customHeightExample,
+  infiniteScrollExample,
+} from "./exampleCode";
 
 // ─── Data ──────────────────────────────────────────────────────────────────
-
 const RATIOS = [1.0, 1.4, 0.8, 1.8, 1.2, 1.6, 0.9, 1.5, 1.3, 1.1];
 const TITLES = [
   "Morning Light", "Urban Geometry", "Forest Path", "Ocean Sunset",
   "Mountain View", "City Lights", "Desert Bloom", "Autumn Leaves",
-  "Rainy Day", "Starry Night",
+  "Rainy Day", "Starry Night", "Golden Hour", "Street Art",
+  "Wildflowers", "Coastal Walk", "Neon District", "Misty Valley",
 ];
-const AUTHORS = ["Alex Kim", "Sara Chen", "Leo Park", "Mia Torres", "Jake Lee"];
+const AUTHORS = [
+  "Alex Kim", "Sara Chen", "Leo Park", "Mia Torres", "Jake Lee",
+  "Nina Patel", "Riku Sato", "Emma Davis",
+];
+const CATEGORIES = ["Nature", "Urban", "Portrait", "Food", "Travel", "Art", "Architecture", "Fashion"];
 
 const ALL_PINS = Array.from({ length: 200 }, (_, i) => {
   const ratio = RATIOS[i % RATIOS.length];
@@ -20,6 +33,7 @@ const ALL_PINS = Array.from({ length: 200 }, (_, i) => {
     image: `https://picsum.photos/seed/${i + 10}/${w}/${h}`,
     title: TITLES[i % TITLES.length],
     author: AUTHORS[i % AUTHORS.length],
+    category: CATEGORIES[i % CATEGORIES.length],
     likes: ((i * 137 + 53) % 1950) + 50,
     width: w,
     height: h,
@@ -29,121 +43,112 @@ const ALL_PINS = Array.from({ length: 200 }, (_, i) => {
 const PAGE_SIZE = 8;
 const SKELETON_RATIOS = [1.0, 1.4, 0.8, 1.8, 1.2, 1.6, 0.9, 1.5];
 
-// ─── Code Snippet ───────────────────────────────────────────────────────────
+// ─── Example Configs ────────────────────────────────────────────────────
+const EXAMPLES = {
+  simple: {
+    title: "Simple Grid",
+    tagline: "Minimal setup — just items and a render function",
+    description: "The most basic Pinterest-style masonry layout. Pass your items array, a render function, and the grid handles everything else — virtualization, positioning, and responsive columns. Zero boilerplate, zero layout math.",
+    features: ["Auto-responsive columns", "Virtualized rendering", "Lazy image loading"],
+    code: simpleExample,
+  },
+  overlay: {
+    title: "With Overlays & Actions",
+    tagline: "Interactive cards with Like, Save, and Share buttons",
+    description: "Add hover overlays with custom action buttons to each card. Perfect for social feeds, e-commerce product grids, and any interactive gallery. Full control over overlay content and interaction handlers.",
+    features: ["Hover overlay effects", "Like / Save / Share actions", "Glassmorphism backdrop"],
+    code: overlayExample,
+  },
+  custom: {
+    title: "Custom Heights",
+    tagline: "Cards with text footers and calculated heights",
+    description: "Add text content below images with custom height calculations. The getItemSize callback lets you account for footers, badges, or any extra content while keeping the masonry layout perfectly aligned.",
+    features: ["Custom getItemSize", "Text footer below image", "Dynamic height calculation"],
+    code: customHeightExample,
+  },
+  infinite: {
+    title: "Infinite Scroll",
+    tagline: "Load more items on scroll with skeleton placeholders",
+    description: "Seamless infinite loading with skeleton placeholders that match your grid's aspect ratios. Existing pins stay in place while new ones shimmer in. Uses onEndReached, loadingPlaceholder, and skeletonCount props.",
+    features: ["onEndReached callback", "Skeleton loading placeholders", "Smooth append animation"],
+    code: infiniteScrollExample,
+  },
+};
 
-const CODE = `import { MasonryGrid, getImageSize } from 'react-masonry-virtualized';
+// ─── Feature Data ───────────────────────────────────────────────────────
+const FEATURES = [
+  {
+    icon: "⚡",
+    title: "Virtualized Rendering",
+    description: "Only renders items visible in the viewport. Handles thousands of items without dropping frames.",
+    tag: "Performance",
+  },
+  {
+    icon: "💀",
+    title: "Skeleton Loading",
+    description: "Built-in skeleton placeholders that match your grid's aspect ratios with shimmer animations.",
+    tag: "UX",
+  },
+  {
+    icon: "🔍",
+    title: "SEO-Optimized",
+    description: "Semantic HTML output with proper img alt tags, lazy loading, and structured data support.",
+    tag: "SEO",
+  },
+  {
+    icon: "📐",
+    title: "Custom Sizing",
+    description: "Control item heights with getItemSize — add text footers, badges, or any extra content.",
+    tag: "Layout",
+  },
+];
 
-const PinterestGrid = ({ pins }) => {
-  const [page, setPage] = useState([]);
-  const [fetching, setFetching] = useState(false);
+// ─── Card Components ────────────────────────────────────────────────────
 
-  const loadMore = useCallback(async () => {
-    if (fetching) return;
-    setFetching(true);
-    const next = await fetchNextPage();
-    setPage(prev => [...prev, ...next]);
-    setFetching(false);
-  }, [fetching]);
-
+function PinCardSimple({ pin }) {
   return (
-    <MasonryGrid
-      items={pins}
-      renderItem={(pin) => <PinCard pin={pin} />}
-      getItemSize={async (pin) => {
-        const size = await getImageSize(pin.image);
-        return size; // { width, height }
-      }}
-      gap={16}
-      minWidth={236}
-      loadingPlaceholder={<SkeletonCard />}
-      skeletonCount={8}
-      skeletonAspectRatios={[1.0, 1.6, 0.85, 1.4, 1.2, 1.8, 0.95, 1.3]}
-      onEndReached={loadMore}
-      onEndReachedThreshold={600}
-    />
+    <div className="pin-card">
+      <img src={pin.image} alt={`${pin.title} by ${pin.author}`} loading="lazy" />
+    </div>
   );
-};`;
+}
 
-// ─── Card Component ─────────────────────────────────────────────────────────
-
-function PinCard({ pin }) {
-  const [hovered, setHovered] = useState(false);
+function PinCardOverlay({ pin }) {
   const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   return (
-    <div
-      className="pin-card"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        borderRadius: 18,
-        overflow: "hidden",
-        position: "relative",
-        cursor: "pointer",
-        boxShadow: hovered
-          ? "0 20px 60px rgba(0,0,0,.45)"
-          : "0 4px 20px rgba(0,0,0,.25)",
-        transition: "box-shadow .25s ease, transform .25s ease",
-        transform: hovered ? "translateY(-4px)" : "translateY(0)",
-      }}
-    >
-      <img
-        src={pin.image}
-        alt={pin.title}
-        loading="lazy"
-        style={{ display: "block", width: "100%", height: "auto" }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.72) 100%)",
-          opacity: hovered ? 1 : 0,
-          transition: "opacity .25s ease",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "14px 14px 16px",
-        }}
-      >
-        {/* Like button */}
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+    <div className="pin-card">
+      <img src={pin.image} alt={`${pin.title} by ${pin.author}`} loading="lazy" />
+      <div className="pin-overlay">
+        <div className="pin-actions-top">
           <button
+            className={`pin-action-btn${saved ? " saved" : ""}`}
+            onClick={(e) => { e.stopPropagation(); setSaved((s) => !s); }}
+            aria-label={saved ? "Unsave pin" : "Save pin"}
+          >
+            {saved ? "📌" : "📍"}
+          </button>
+          <button
+            className={`pin-action-btn${liked ? " liked" : ""}`}
             onClick={(e) => { e.stopPropagation(); setLiked((l) => !l); }}
-            style={{
-              background: liked
-                ? "linear-gradient(135deg,#ff3d6b,#ff6b3d)"
-                : "rgba(255,255,255,0.15)",
-              backdropFilter: "blur(8px)",
-              border: "none",
-              borderRadius: 50,
-              width: 48,
-              height: 48,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 17,
-              transition: "background .2s ease, transform .15s ease",
-              transform: liked ? "scale(1.15)" : "scale(1)",
-            }}
-            aria-label="Like"
+            aria-label={liked ? "Unlike" : "Like"}
           >
             {liked ? "❤️" : "🤍"}
           </button>
+          <button
+            className="pin-action-btn"
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Share pin"
+          >
+            🔗
+          </button>
         </div>
-
-        {/* Info */}
-        <div>
-          <p style={{ margin: 0, color: "#fff", fontWeight: 700, fontSize: 14, letterSpacing: 0.2, textShadow: "0 1px 4px rgba(0,0,0,.5)" }}>
-            {pin.title}
-          </p>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
-            <span style={{ color: "rgba(255,255,255,.75)", fontSize: 12 }}>@{pin.author}</span>
-            <span style={{ color: "rgba(255,255,255,.65)", fontSize: 12 }}>
-              ♥ {(pin.likes + (liked ? 1 : 0)).toLocaleString()}
-            </span>
+        <div className="pin-info">
+          <p className="pin-title">{pin.title}</p>
+          <div className="pin-meta">
+            <span className="pin-author">@{pin.author}</span>
+            <span className="pin-likes">♥ {(pin.likes + (liked ? 1 : 0)).toLocaleString()}</span>
           </div>
         </div>
       </div>
@@ -151,7 +156,17 @@ function PinCard({ pin }) {
   );
 }
 
-// ─── Skeleton Card ──────────────────────────────────────────────────────────
+function PinCardCustom({ pin }) {
+  return (
+    <div className="pin-card-custom">
+      <img src={pin.image} alt={`${pin.title} by ${pin.author}`} loading="lazy" />
+      <div className="pin-card-custom-footer">
+        <h3>{pin.title}</h3>
+        <span className="pin-author">@{pin.author} · {pin.category}</span>
+      </div>
+    </div>
+  );
+}
 
 function SkeletonCard() {
   return (
@@ -159,7 +174,7 @@ function SkeletonCard() {
       style={{
         borderRadius: 18,
         overflow: "hidden",
-        background: "linear-gradient(90deg, #1e1e2e 25%, #2a2a3e 50%, #1e1e2e 75%)",
+        background: "linear-gradient(90deg, #e8e4df 25%, #f0ece6 50%, #e8e4df 75%)",
         backgroundSize: "200% 100%",
         animation: "shimmer 1.6s infinite",
         width: "100%",
@@ -169,31 +184,32 @@ function SkeletonCard() {
   );
 }
 
-// ─── Page ───────────────────────────────────────────────────────────────────
-
+// ─── Helper ─────────────────────────────────────────────────────────────
 function fetchNextPage(page) {
   const start = page * PAGE_SIZE;
   return Promise.resolve(ALL_PINS.slice(start, start + PAGE_SIZE));
 }
 
+// ─── Main App ───────────────────────────────────────────────────────────
 export default function App() {
-  const [gap, setGap] = useState(16);
-  const [minWidth, setMinWidth] = useState(236);
+  // Intro animation
+  const [introVisible, setIntroVisible] = useState(true);
+  const [introFading, setIntroFading] = useState(false);
+
+  useEffect(() => {
+    const fadeTimer = setTimeout(() => setIntroFading(true), 1800);
+    const hideTimer = setTimeout(() => setIntroVisible(false), 2400);
+    return () => { clearTimeout(fadeTimer); clearTimeout(hideTimer); };
+  }, []);
+
+  // Sidebar
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeExample, setActiveExample] = useState("overlay");
+
+  // Code toggle
   const [showCode, setShowCode] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const rafGap = useRef(null);
-  const rafMinWidth = useRef(null);
 
-  const handleGapChange = useCallback((e) => {
-    if (rafGap.current) cancelAnimationFrame(rafGap.current);
-    rafGap.current = requestAnimationFrame(() => setGap(Number(e.target.value)));
-  }, []);
-
-  const handleMinWidthChange = useCallback((e) => {
-    if (rafMinWidth.current) cancelAnimationFrame(rafMinWidth.current);
-    rafMinWidth.current = requestAnimationFrame(() => setMinWidth(Number(e.target.value)));
-  }, []);
-
+  // Infinite scroll
   const [visiblePins, setVisiblePins] = useState(ALL_PINS.slice(0, PAGE_SIZE));
   const [isFetching, setIsFetching] = useState(false);
   const pageRef = useRef(1);
@@ -208,173 +224,179 @@ export default function App() {
     setIsFetching(false);
   }, [isFetching, hasMore]);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(CODE);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  // Current example config
+  const example = EXAMPLES[activeExample];
+
+  // Card renderer
+  const renderCard = useCallback(
+    (pin) => {
+      switch (activeExample) {
+        case "simple":
+          return <PinCardSimple pin={pin} />;
+        case "custom":
+          return <PinCardCustom pin={pin} />;
+        case "overlay":
+        case "infinite":
+        default:
+          return <PinCardOverlay pin={pin} />;
+      }
+    },
+    [activeExample]
+  );
+
+  // getItemSize
+  const getItemSize = useCallback(
+    (pin) => {
+      if (activeExample === "custom") {
+        const footerHeight = 52;
+        return { width: pin.width, height: pin.height + Math.round(footerHeight * (pin.width / 236)) };
+      }
+      return { width: pin.width, height: pin.height };
+    },
+    [activeExample]
+  );
+
+  // Items to show
+  const displayPins = activeExample === "infinite" ? visiblePins : ALL_PINS.slice(0, 40);
+
+  // ─── Intro Screen ──────────────────────────────────────────────────────
+  if (introVisible) {
+    return (
+      <div className={`intro-screen${introFading ? " intro-fade-out" : ""}`}>
+        <div className="intro-content">
+          <div className="intro-logo-icon">P</div>
+          <h1 className="intro-title">
+            Pint<span>Demo</span>
+          </h1>
+          <p className="intro-tagline">Pinterest-style Masonry Grids for React</p>
+          <div className="intro-loader">
+            <div className="intro-loader-bar" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #0d0d1a 0%, #12122a 100%)", color: "#fff", fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
+    <div className="app-layout app-enter">
+      {/* ── Sidebar ── */}
+      <Sidebar
+        activeExample={activeExample}
+        onExampleChange={setActiveExample}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-      {/* ── Header ── */}
-      <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(13,13,26,0.85)", backdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,.07)", padding: "0 24px" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", height: 62, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-
-          {/* Left: branding */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 22, fontWeight: 800, background: "linear-gradient(90deg,#a78bfa,#818cf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: -0.5 }}>
-              Pint<span style={{ WebkitTextFillColor: "#fff" }}>Demo</span>
-            </span>
-            <span style={{ background: "rgba(167,139,250,.15)", color: "#a78bfa", border: "1px solid rgba(167,139,250,.3)", borderRadius: 20, padding: "2px 10px", fontSize: 12, fontWeight: 600 }}>
-              react-masonry-virtualized v2.0.3
-            </span>
-          </div>
-
-          {/* Right: controls */}
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,.65)" }}>
-              Gap
-              <input type="range" min={4} max={40} value={gap} onChange={handleGapChange} style={{ accentColor: "#a78bfa", width: 80 }} />
-              <span style={{ minWidth: 28 }}>{gap}px</span>
-            </label>
-            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,.65)" }}>
-              Min Width
-              <input type="range" min={160} max={400} value={minWidth} onChange={handleMinWidthChange} style={{ accentColor: "#a78bfa", width: 80 }} />
-              <span style={{ minWidth: 36 }}>{minWidth}px</span>
-            </label>
+      {/* ── Main ── */}
+      <main className="main-content">
+        {/* ── Minimal Top Bar ── */}
+        <header className="top-bar" role="banner">
+          <div className="top-bar-inner">
             <button
-              onClick={() => setShowCode((v) => !v)}
-              style={{
-                background: showCode ? "linear-gradient(135deg,#a78bfa,#818cf8)" : "rgba(167,139,250,.12)",
-                color: showCode ? "#fff" : "#a78bfa",
-                border: "1px solid rgba(167,139,250,.3)",
-                borderRadius: 8,
-                padding: "6px 14px",
-                cursor: "pointer",
-                fontSize: 13,
-                fontWeight: 600,
-                transition: "all .2s",
-              }}
+              className="hamburger-btn"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
             >
-              {showCode ? "Hide Code" : "View Code"}
+              ☰
+            </button>
+
+            <div className="top-bar-title">
+              <h2>{example.title}</h2>
+              <span className="top-bar-tagline">{example.tagline}</span>
+            </div>
+
+            <button
+              className={`btn-toggle ${showCode ? "btn-toggle-on" : "btn-toggle-off"}`}
+              onClick={() => setShowCode((v) => !v)}
+            >
+              {showCode ? "← Hide Code" : "View Code →"}
             </button>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* ── Hero ── */}
-      <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center", padding: "56px 24px 32px" }}>
-        <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, background: "linear-gradient(135deg,#fff 30%,#a78bfa 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", lineHeight: 1.15 }}>
-          Pinterest-style Masonry Grid
-        </h1>
-        <p style={{ color: "rgba(255,255,255,.5)", marginTop: 14, fontSize: 16, maxWidth: 560, margin: "14px auto 0", lineHeight: 1.6 }}>
-          Virtualized masonry with{" "}
-          <code style={{ background: "rgba(167,139,250,.15)", border: "1px solid rgba(167,139,250,.25)", borderRadius: 6, padding: "1px 7px", color: "#a78bfa", fontSize: 14 }}>MasonryGrid</code>
-          {" "}+{" "}
-          <code style={{ background: "rgba(167,139,250,.15)", border: "1px solid rgba(167,139,250,.25)", borderRadius: 6, padding: "1px 7px", color: "#a78bfa", fontSize: 14 }}>getImageSize</code>
-          . Infinite scroll, skeleton loading, zero boilerplate.
-        </p>
-
-        {/* Intro Content (SEO) */}
-        <p style={{ color: "rgba(255,255,255,.55)", marginTop: 16, fontSize: 14, maxWidth: 620, margin: "16px auto 0", lineHeight: 1.7 }}>
-          <strong style={{ color: "rgba(255,255,255,.75)" }}>react-masonry-virtualized</strong> is an open-source React component
-          that makes it easy to build Pinterest-style image grids. It handles virtualization, infinite scrolling,
-          and skeleton loading out of the box — so you can focus on your content instead of layout math.
-        </p>
-
-        {/* Install + Links */}
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
-          <code style={{ background: "rgba(167,139,250,.12)", border: "1px solid rgba(167,139,250,.25)", borderRadius: 8, padding: "6px 14px", color: "#a78bfa", fontSize: 13 }}>
-            npm install react-masonry-virtualized
-          </code>
-          <a href="https://www.npmjs.com/package/react-masonry-virtualized" target="_blank" rel="noopener noreferrer" style={{ color: "#a78bfa", fontSize: 13, fontWeight: 600, textDecoration: "none", borderBottom: "1px solid rgba(167,139,250,.3)", paddingBottom: 1 }}>
-            npm ↗
-          </a>
-          <a href="https://github.com/nickvdyck/react-masonry-virtualized" target="_blank" rel="noopener noreferrer" style={{ color: "#a78bfa", fontSize: 13, fontWeight: 600, textDecoration: "none", borderBottom: "1px solid rgba(167,139,250,.3)", paddingBottom: 1 }}>
-            GitHub ↗
-          </a>
-        </div>
-
-        {/* Stats */}
-        <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 28, flexWrap: "wrap" }}>
-          {[
-            { label: "Shown", value: `${visiblePins.length} / ${ALL_PINS.length}` },
-            { label: "Virtualized", value: "✓" },
-            { label: "Page size", value: `${PAGE_SIZE}` },
-            { label: "Version", value: "v2.0.3" },
-          ].map(({ label, value }) => (
-            <div key={label} style={{ background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: "10px 22px", textAlign: "center" }}>
-              <div style={{ fontSize: 18, fontWeight: 700, background: "linear-gradient(90deg,#a78bfa,#818cf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                {value}
-              </div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>{label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Code Panel ── */}
-      {showCode && (
-        <div style={{ maxWidth: 860, margin: "0 auto 32px", padding: "0 24px" }}>
-          <div style={{ background: "#0f0f1c", border: "1px solid rgba(167,139,250,.2)", borderRadius: 14, overflow: "hidden" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 18px", borderBottom: "1px solid rgba(167,139,250,.1)" }}>
-              <span style={{ fontSize: 13, color: "rgba(255,255,255,.4)", fontFamily: "monospace" }}>MasonryGrid usage</span>
-              <button
-                onClick={handleCopy}
-                style={{ background: "rgba(167,139,250,.15)", border: "1px solid rgba(167,139,250,.3)", color: copied ? "#4ade80" : "#a78bfa", borderRadius: 6, padding: "4px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all .2s" }}
-              >
-                {copied ? "✓ Copied" : "Copy"}
-              </button>
-            </div>
-            <pre style={{ padding: "22px 24px", overflowX: "auto", fontSize: 13, lineHeight: 1.7, color: "#c4b5fd", margin: 0 }}>
-              <code>{CODE}</code>
-            </pre>
-          </div>
-        </div>
-      )}
-
-      {/* ── Skeleton Feature Callout ── */}
-      <div style={{ maxWidth: 860, margin: "0 auto 32px", padding: "0 24px" }}>
-        <div style={{ background: "rgba(167,139,250,.08)", border: "1px solid rgba(167,139,250,.2)", borderRadius: 14, padding: "16px 24px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-          <div style={{ fontSize: 28 }}>💀</div>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: "#a78bfa", marginBottom: 2 }}>Skeleton loading in action</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", lineHeight: 1.5 }}>
-              Scroll to the bottom — existing pins stay in place while new ones shimmer in. Uses{" "}
-              <code style={{ color: "#a78bfa", fontSize: 12 }}>loadingPlaceholder</code>,{" "}
-              <code style={{ color: "#a78bfa", fontSize: 12 }}>skeletonCount</code>, and{" "}
-              <code style={{ color: "#a78bfa", fontSize: 12 }}>skeletonAspectRatios</code> props.
+        {/* ── Example Description ── */}
+        <section className="example-intro" aria-labelledby="example-heading">
+          <div className="example-intro-inner">
+            <h1 id="example-heading" className="example-heading">{example.title}</h1>
+            <p className="example-description">{example.description}</p>
+            <div className="example-features">
+              {example.features.map((f) => (
+                <span key={f} className="example-feature-tag">✓ {f}</span>
+              ))}
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* ── Grid ── */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px" }}>
-        <MasonryGrid
-          items={visiblePins}
-          renderItem={(pin) => <PinCard pin={pin} />}
-          getItemSize={(pin) => ({ width: pin.width, height: pin.height })}
-          gap={gap}
-          minWidth={minWidth}
-          loadingPlaceholder={<SkeletonCard />}
-          skeletonCount={PAGE_SIZE}
-          skeletonAspectRatios={SKELETON_RATIOS}
-          onEndReached={loadMore}
-          onEndReachedThreshold={600}
-        />
-      </div>
-
-      {/* ── Footer ── */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "32px 0 56px", color: "rgba(255,255,255,.35)", fontSize: 13 }}>
-        {hasMore ? (
-          <span style={{ opacity: 0.4 }}>Scroll down for more</span>
-        ) : (
-          <span>— You've seen all {ALL_PINS.length} pins —</span>
+        {/* ── Code Panel ── */}
+        {showCode && (
+          <div className="code-panel">
+            <CodeBlock code={example.code.code} title={example.code.title} />
+          </div>
         )}
-      </div>
 
+        {/* ── Live Grid ── */}
+        <section className="grid-section" aria-label={`${example.title} live demo`}>
+          <div className="grid-container">
+            <MasonryGrid
+              items={displayPins}
+              renderItem={renderCard}
+              getItemSize={getItemSize}
+              gap={16}
+              minWidth={236}
+              loadingPlaceholder={<SkeletonCard />}
+              skeletonCount={PAGE_SIZE}
+              skeletonAspectRatios={SKELETON_RATIOS}
+              onEndReached={activeExample === "infinite" ? loadMore : undefined}
+              onEndReachedThreshold={600}
+            />
+          </div>
+        </section>
+
+        {/* ── Features (only on first example) ── */}
+        {activeExample === "overlay" && (
+          <section className="features-section" aria-labelledby="features-heading">
+            <h2 className="section-title" id="features-heading">Why react-masonry-virtualized?</h2>
+            <p className="section-subtitle">Built for performance, SEO, and developer experience</p>
+            <div className="features-grid">
+              {FEATURES.map((f) => (
+                <FeatureCard key={f.title} {...f} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Footer ── */}
+        <footer className="app-footer" role="contentinfo">
+          <div className="footer-content">
+            <div className="footer-left">
+              <h3>react-masonry-virtualized</h3>
+              <p>
+                A lightweight, performant React component for building Pinterest-style masonry grids.
+                Supports virtualization, infinite scroll, skeleton loading, and custom actions.
+                MIT licensed and ready for production.
+              </p>
+            </div>
+            <div className="footer-links">
+              <div className="footer-col">
+                <h4>Resources</h4>
+                <a href="https://www.npmjs.com/package/react-masonry-virtualized" target="_blank" rel="noopener noreferrer">npm Package</a>
+                <a href="https://github.com/kedar200/react-masonry-virtualized" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://react.dev" target="_blank" rel="noopener noreferrer">React Docs</a>
+              </div>
+              <div className="footer-col">
+                <h4>Examples</h4>
+                <button className="footer-link-btn" onClick={() => setActiveExample("simple")}>Simple Grid</button>
+                <button className="footer-link-btn" onClick={() => setActiveExample("overlay")}>Overlays</button>
+                <button className="footer-link-btn" onClick={() => setActiveExample("custom")}>Custom Heights</button>
+                <button className="footer-link-btn" onClick={() => setActiveExample("infinite")}>Infinite Scroll</button>
+              </div>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <span>Built with react-masonry-virtualized v2.0.3</span>
+          </div>
+        </footer>
+      </main>
     </div>
   );
 }
