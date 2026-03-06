@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { MasonryGrid, getImageSize } from "react-masonry-virtualized";
+import { MasonryGrid } from "react-masonry-virtualized";
 
 // ─── Data ──────────────────────────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ const ALL_PINS = Array.from({ length: 200 }, (_, i) => {
 });
 
 const PAGE_SIZE = 8;
-const SKELETON_RATIOS = [1.0, 1.6, 0.85, 1.4, 1.2, 1.8, 0.95, 1.3];
+const SKELETON_RATIOS = [1.0, 1.4, 0.8, 1.8, 1.2, 1.6, 0.9, 1.5];
 
 // ─── Code Snippet ───────────────────────────────────────────────────────────
 
@@ -118,8 +118,8 @@ function PinCard({ pin }) {
               backdropFilter: "blur(8px)",
               border: "none",
               borderRadius: 50,
-              width: 38,
-              height: 38,
+              width: 48,
+              height: 48,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
@@ -181,6 +181,18 @@ export default function App() {
   const [minWidth, setMinWidth] = useState(236);
   const [showCode, setShowCode] = useState(false);
   const [copied, setCopied] = useState(false);
+  const rafGap = useRef(null);
+  const rafMinWidth = useRef(null);
+
+  const handleGapChange = useCallback((e) => {
+    if (rafGap.current) cancelAnimationFrame(rafGap.current);
+    rafGap.current = requestAnimationFrame(() => setGap(Number(e.target.value)));
+  }, []);
+
+  const handleMinWidthChange = useCallback((e) => {
+    if (rafMinWidth.current) cancelAnimationFrame(rafMinWidth.current);
+    rafMinWidth.current = requestAnimationFrame(() => setMinWidth(Number(e.target.value)));
+  }, []);
 
   const [visiblePins, setVisiblePins] = useState(ALL_PINS.slice(0, PAGE_SIZE));
   const [isFetching, setIsFetching] = useState(false);
@@ -223,12 +235,12 @@ export default function App() {
           <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
             <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,.65)" }}>
               Gap
-              <input type="range" min={4} max={40} value={gap} onChange={(e) => setGap(Number(e.target.value))} style={{ accentColor: "#a78bfa", width: 80 }} />
+              <input type="range" min={4} max={40} value={gap} onChange={handleGapChange} style={{ accentColor: "#a78bfa", width: 80 }} />
               <span style={{ minWidth: 28 }}>{gap}px</span>
             </label>
             <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,.65)" }}>
               Min Width
-              <input type="range" min={160} max={400} value={minWidth} onChange={(e) => setMinWidth(Number(e.target.value))} style={{ accentColor: "#a78bfa", width: 80 }} />
+              <input type="range" min={160} max={400} value={minWidth} onChange={handleMinWidthChange} style={{ accentColor: "#a78bfa", width: 80 }} />
               <span style={{ minWidth: 36 }}>{minWidth}px</span>
             </label>
             <button
@@ -263,6 +275,26 @@ export default function App() {
           <code style={{ background: "rgba(167,139,250,.15)", border: "1px solid rgba(167,139,250,.25)", borderRadius: 6, padding: "1px 7px", color: "#a78bfa", fontSize: 14 }}>getImageSize</code>
           . Infinite scroll, skeleton loading, zero boilerplate.
         </p>
+
+        {/* Intro Content (SEO) */}
+        <p style={{ color: "rgba(255,255,255,.55)", marginTop: 16, fontSize: 14, maxWidth: 620, margin: "16px auto 0", lineHeight: 1.7 }}>
+          <strong style={{ color: "rgba(255,255,255,.75)" }}>react-masonry-virtualized</strong> is an open-source React component
+          that makes it easy to build Pinterest-style image grids. It handles virtualization, infinite scrolling,
+          and skeleton loading out of the box — so you can focus on your content instead of layout math.
+        </p>
+
+        {/* Install + Links */}
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
+          <code style={{ background: "rgba(167,139,250,.12)", border: "1px solid rgba(167,139,250,.25)", borderRadius: 8, padding: "6px 14px", color: "#a78bfa", fontSize: 13 }}>
+            npm install react-masonry-virtualized
+          </code>
+          <a href="https://www.npmjs.com/package/react-masonry-virtualized" target="_blank" rel="noopener noreferrer" style={{ color: "#a78bfa", fontSize: 13, fontWeight: 600, textDecoration: "none", borderBottom: "1px solid rgba(167,139,250,.3)", paddingBottom: 1 }}>
+            npm ↗
+          </a>
+          <a href="https://github.com/nickvdyck/react-masonry-virtualized" target="_blank" rel="noopener noreferrer" style={{ color: "#a78bfa", fontSize: 13, fontWeight: 600, textDecoration: "none", borderBottom: "1px solid rgba(167,139,250,.3)", paddingBottom: 1 }}>
+            GitHub ↗
+          </a>
+        </div>
 
         {/* Stats */}
         <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 28, flexWrap: "wrap" }}>
@@ -323,10 +355,7 @@ export default function App() {
         <MasonryGrid
           items={visiblePins}
           renderItem={(pin) => <PinCard pin={pin} />}
-          getItemSize={async (pin) => {
-            // Real image size fetch — triggers skeleton while waiting
-            return await getImageSize(pin.image);
-          }}
+          getItemSize={(pin) => ({ width: pin.width, height: pin.height })}
           gap={gap}
           minWidth={minWidth}
           loadingPlaceholder={<SkeletonCard />}
@@ -346,16 +375,6 @@ export default function App() {
         )}
       </div>
 
-      {/* ── Keyframes ── */}
-      <style>{`
-        @keyframes shimmer {
-          0%   { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { overflow-x: hidden; }
-        input[type="range"] { cursor: pointer; }
-      `}</style>
     </div>
   );
 }

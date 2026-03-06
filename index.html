@@ -3,13 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>React Masonry Virtualized Demo</title>
+  <title>React Masonry Virtualized Demo — Pinterest-style Grids with Virtualization</title>
+  <meta name="description" content="Live interactive demo for react-masonry-virtualized v2.0.3 — Pinterest-style masonry grids with virtualization, infinite scroll, and skeleton loading for React.">
+  <link rel="canonical" href="https://pint-demo.netlify.app/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="React Masonry Virtualized Demo">
+  <meta property="og:description" content="Interactive demo showcasing Pinterest-style masonry grids with virtualization, infinite scroll, and skeleton loading.">
+  <meta property="og:url" content="https://pint-demo.netlify.app/">
+  <meta property="og:site_name" content="PintDemo">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="React Masonry Virtualized Demo">
+  <meta name="twitter:description" content="Interactive demo showcasing Pinterest-style masonry grids with virtualization, infinite scroll, and skeleton loading.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "React Masonry Virtualized Demo",
+    "url": "https://pint-demo.netlify.app/",
+    "description": "Live interactive demo showcasing react-masonry-virtualized v2.0.3 — a React component for Pinterest-style masonry grids with virtualization, infinite scroll, and skeleton loading.",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "PintDemo",
+      "url": "https://pint-demo.netlify.app/"
+    },
+    "about": {
+      "@type": "SoftwareSourceCode",
+      "name": "react-masonry-virtualized",
+      "version": "2.0.3",
+      "programmingLanguage": "JavaScript",
+      "runtimePlatform": "React",
+      "codeRepository": "https://www.npmjs.com/package/react-masonry-virtualized",
+      "description": "A React component for building Pinterest-style masonry grids with built-in virtualization, infinite scroll, and skeleton loading support.",
+      "license": "https://opensource.org/licenses/MIT",
+      "keywords": ["react", "masonry", "virtualized", "infinite-scroll", "pinterest-grid", "skeleton-loading"]
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://pint-demo.netlify.app/"
+        }
+      ]
+    }
+  }
+  </script>
 </head>
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
+  <noscript>
+    <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+      <h1>React Masonry Virtualized Demo</h1>
+      <p>This demo requires JavaScript to run. Please enable JavaScript or visit the
+      <a href="https://www.npmjs.com/package/react-masonry-virtualized">npm package page</a>.</p>
+    </div>
+  </noscript>
 </body>
 </html>
