@@ -560,7 +560,6 @@ body {
 
 /* ─── Pin Card ────────────────────────────────────────────────────────────── */
 .pin-card {
-  border-radius: var(--radius-lg);
   overflow: hidden;
   position: relative;
   cursor: pointer;
@@ -568,10 +567,12 @@ body {
   transition: box-shadow var(--transition-normal), transform var(--transition-normal);
 }
 
-.pin-card:hover {
-  box-shadow: var(--shadow-xl);
-  transform: translateY(-4px);
+/* Ensure zoomed cards (which use z-index: 10 from the library) are above the sidebar (z-index: 100) */
+.grid-container div[style*="z-index"] {
+  z-index: 1000 !important;
 }
+
+
 
 .pin-card img {
   display: block;

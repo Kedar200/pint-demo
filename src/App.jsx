@@ -348,6 +348,8 @@ export default function App() {
               skeletonAspectRatios={SKELETON_RATIOS}
               onEndReached={activeExample === "infinite" ? loadMore : undefined}
               onEndReachedThreshold={600}
+              enableZoomOnHover
+              zoomScale={1.3}
             />
           </div>
         </section>
