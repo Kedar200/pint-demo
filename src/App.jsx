@@ -8,6 +8,7 @@ import {
   overlayExample,
   customHeightExample,
   infiniteScrollExample,
+  programmaticScrollExample,
 } from "./exampleCode";
 
 // ─── Data ──────────────────────────────────────────────────────────────────
@@ -73,6 +74,13 @@ const EXAMPLES = {
     features: ["onEndReached callback", "Skeleton loading placeholders", "Smooth append animation"],
     code: infiniteScrollExample,
   },
+  scroll: {
+    title: "Programmatic Scrolling",
+    tagline: "Scroll to any item by index using a ref",
+    description: "Navigate to any item in the grid programmatically using the scrollToIndex method. Pass a ref to MasonryGrid and call scrollToIndex(index, options) to scroll with smooth or instant behavior. Perfect for back-to-top buttons, deep linking, and keyboard navigation.",
+    features: ["scrollToIndex method", "Smooth & instant modes", "Configurable offset"],
+    code: programmaticScrollExample,
+  },
 };
 
 // ─── Feature Data ───────────────────────────────────────────────────────
@@ -100,6 +108,12 @@ const FEATURES = [
     title: "Custom Sizing",
     description: "Control item heights with getItemSize — add text footers, badges, or any extra content.",
     tag: "Layout",
+  },
+  {
+    icon: "🎯",
+    title: "Programmatic Scrolling",
+    description: "Scroll to any item by index via ref — back-to-top, deep linking, and keyboard nav.",
+    tag: "Navigation",
   },
 ];
 
@@ -209,6 +223,11 @@ export default function App() {
   // Code toggle
   const [showCode, setShowCode] = useState(false);
 
+  // Scroll demo state
+  const [scrollIndex, setScrollIndex] = useState(50);
+  const [scrollBehavior, setScrollBehavior] = useState("smooth");
+  const gridRef = useRef(null);
+
   // Infinite scroll
   const [visiblePins, setVisiblePins] = useState(ALL_PINS.slice(0, PAGE_SIZE));
   const [isFetching, setIsFetching] = useState(false);
@@ -255,6 +274,14 @@ export default function App() {
     },
     [activeExample]
   );
+
+  // Scroll handler
+  const handleScrollToIndex = useCallback(() => {
+    gridRef.current?.scrollToIndex(scrollIndex, {
+      behavior: scrollBehavior,
+      offset: 20,
+    });
+  }, [scrollIndex, scrollBehavior]);
 
   // Items to show
   const displayPins = activeExample === "infinite" ? visiblePins : ALL_PINS.slice(0, 40);
@@ -334,10 +361,71 @@ export default function App() {
           </div>
         )}
 
+        {/* ── Scroll Controls (only for scroll demo) ── */}
+        {activeExample === "scroll" && (
+          <div className="scroll-toolbar">
+            <div className="scroll-toolbar-inner">
+              <div className="scroll-input-group">
+                <label htmlFor="scroll-index">Item Index</label>
+                <input
+                  id="scroll-index"
+                  type="number"
+                  min={0}
+                  max={displayPins.length - 1}
+                  value={scrollIndex}
+                  onChange={(e) => setScrollIndex(Math.max(0, Math.min(displayPins.length - 1, Number(e.target.value))))}
+                  className="scroll-input"
+                />
+              </div>
+              <div className="scroll-input-group">
+                <label>Behavior</label>
+                <div className="scroll-behavior-toggle">
+                  <button
+                    className={`scroll-behavior-btn${scrollBehavior === "smooth" ? " active" : ""}`}
+                    onClick={() => setScrollBehavior("smooth")}
+                  >
+                    Smooth
+                  </button>
+                  <button
+                    className={`scroll-behavior-btn${scrollBehavior === "auto" ? " active" : ""}`}
+                    onClick={() => setScrollBehavior("auto")}
+                  >
+                    Instant
+                  </button>
+                </div>
+              </div>
+              <button className="scroll-go-btn" onClick={handleScrollToIndex}>
+                🎯 Scroll to Item
+              </button>
+              <div className="scroll-quick-actions">
+                <button
+                  className="scroll-quick-btn"
+                  onClick={() => { setScrollIndex(0); gridRef.current?.scrollToIndex(0, { behavior: scrollBehavior, offset: 20 }); }}
+                >
+                  ⬆ Top
+                </button>
+                <button
+                  className="scroll-quick-btn"
+                  onClick={() => { setScrollIndex(Math.floor(displayPins.length / 2)); gridRef.current?.scrollToIndex(Math.floor(displayPins.length / 2), { behavior: scrollBehavior, offset: 20 }); }}
+                >
+                  ↕ Middle
+                </button>
+                <button
+                  className="scroll-quick-btn"
+                  onClick={() => { setScrollIndex(displayPins.length - 1); gridRef.current?.scrollToIndex(displayPins.length - 1, { behavior: scrollBehavior, offset: 20 }); }}
+                >
+                  ⬇ Bottom
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── Live Grid ── */}
         <section className="grid-section" aria-label={`${example.title} live demo`}>
           <div className="grid-container">
             <MasonryGrid
+              ref={gridRef}
               items={displayPins}
               renderItem={renderCard}
               getItemSize={getItemSize}
@@ -391,11 +479,12 @@ export default function App() {
                 <button className="footer-link-btn" onClick={() => setActiveExample("overlay")}>Overlays</button>
                 <button className="footer-link-btn" onClick={() => setActiveExample("custom")}>Custom Heights</button>
                 <button className="footer-link-btn" onClick={() => setActiveExample("infinite")}>Infinite Scroll</button>
+                <button className="footer-link-btn" onClick={() => setActiveExample("scroll")}>Scroll To Item</button>
               </div>
             </div>
           </div>
           <div className="footer-bottom">
-            <span>Built with react-masonry-virtualized v2.0.3</span>
+            <span>Built with react-masonry-virtualized v2.2.0</span>
           </div>
         </footer>
       </main>

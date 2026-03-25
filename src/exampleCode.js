@@ -127,6 +127,52 @@ const InfiniteGrid = () => {
 };`,
 };
 
+// ─── Programmatic Scrolling Example ─────────────────────────────────────
+export const programmaticScrollExample = {
+  title: "Programmatic Scrolling",
+  desc: "Scroll to any item by index using a ref.",
+  code: `import { useRef } from 'react';
+import { MasonryGrid, MasonryGridRef } from 'react-masonry-virtualized';
+
+const ScrollableGrid = ({ items }) => {
+  const gridRef = useRef<MasonryGridRef>(null);
+
+  const scrollToItem = (index, behavior = 'smooth') => {
+    gridRef.current?.scrollToIndex(index, {
+      behavior,
+      offset: 20
+    });
+  };
+
+  return (
+    <>
+      <div className="scroll-controls">
+        <button onClick={() => scrollToItem(0)}>
+          ⬆ Back to Top
+        </button>
+        <button onClick={() => scrollToItem(50)}>
+          Go to #50
+        </button>
+        <button onClick={() => scrollToItem(100, 'auto')}>
+          Jump to #100
+        </button>
+      </div>
+      <MasonryGrid
+        ref={gridRef}
+        items={items}
+        renderItem={(item) => <Card item={item} />}
+        getItemSize={(item) => ({
+          width: item.width,
+          height: item.height
+        })}
+        gap={16}
+        minWidth={236}
+      />
+    </>
+  );
+};`,
+};
+
 // ─── SEO-Friendly Example ───────────────────────────────────────────────
 export const seoExample = {
   title: "SEO-Friendly Grid",

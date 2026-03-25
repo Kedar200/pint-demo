@@ -5,6 +5,7 @@ const EXAMPLE_ITEMS = [
   { id: 'overlay', icon: '🖼️', label: 'With Overlays' },
   { id: 'custom', icon: '📦', label: 'Custom Heights' },
   { id: 'infinite', icon: '🔄', label: 'Infinite Scroll' },
+  { id: 'scroll', icon: '🎯', label: 'Scroll To Item' },
 ];
 
 export default function Sidebar({ activeExample, onExampleChange, isOpen, onClose }) {
@@ -23,7 +24,7 @@ export default function Sidebar({ activeExample, onExampleChange, isOpen, onClos
           </div>
         </div>
 
-        <div className="sidebar-version">react-masonry-virtualized v2.0.3</div>
+        <div className="sidebar-version">react-masonry-virtualized v2.2.0</div>
 
         {/* Examples Navigation */}
         <nav className="sidebar-nav" aria-label="Examples">
